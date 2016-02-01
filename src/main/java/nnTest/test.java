@@ -1,18 +1,12 @@
 package nnTest;
 
-import java.util.Arrays;
 import java.util.stream.Stream;
 
 public class test {
-  public static void main(String[] args) {
-    Network network = new Network(2, 2, 1);
+  public static void main(String[] args) throws Exception{
+    Network network = new Network(4, 2, 2, 3);
 
-    DataPoint[] data = Stream.of(
-      new DataPoint(1.0, 1.0, 1.0),
-      new DataPoint(0.5, 1.0, 0.0),
-      new DataPoint(0.9, 0.0, 1.0),
-      new DataPoint(0.0, 0.0, 0.0)
-    ).toArray(DataPoint[]::new);
+    DataPoint[] data = IrisParser.getData();
 
     double priorCurrentOut = getCost(data, network);
 
@@ -24,10 +18,6 @@ public class test {
         network = newNet;
         System.out.println("----------------------------");
         System.out.println("Total cost: " + newOut);
-        for (DataPoint datapoint : data) {
-          System.out.println(datapoint);
-          System.out.println("Real output: " + Arrays.toString(network.getOutput(datapoint)));
-        }
       }
     }
     System.out.println("Network:");
