@@ -13,9 +13,10 @@ public class MinimizingRunner {
     double nextPrintTime = System.currentTimeMillis() + 200;
     progressBar.printUpdatedValue(0);
     for (int i = 0; i < runs; i++) {
-      if((i % 100 == 0) && (System.currentTimeMillis() > nextPrintTime)){
+      if((System.currentTimeMillis() > nextPrintTime)){
         nextPrintTime = System.currentTimeMillis() + 200;
         progressBar.printUpdatedValue(i);
+        System.out.print(" Cost: " + bestOutputCost);
       }
       Network newNetwork = bestNetwork.randomisedOne();
       double newOutputCost = getTotalCost(dataPoints, newNetwork);
@@ -28,7 +29,53 @@ public class MinimizingRunner {
     return bestNetwork;
   }
 
+  public static DataPoint improveDataPoint(Network inputNet, double[] requiredOutput, double[] inputs, int runs) {
+    ProgressBar progressBar = new ProgressBar(runs);
+    double[] bestInputs = inputs;
+    DataPoint bestDataPoint = new DataPoint(requiredOutput, bestInputs);
+    double bestOutputCost = getTotalCost(new DataPoint[] {bestDataPoint}, inputNet);
+    double nextPrintTime = System.currentTimeMillis() + 200;
+    progressBar.printUpdatedValue(0);
+    for (int i = 0; i < runs; i++) {
+      if((System.currentTimeMillis() > nextPrintTime)){
+        nextPrintTime = System.currentTimeMillis() + 200;
+        progressBar.printUpdatedValue(i);
+        System.out.print(" Cost: " + bestOutputCost);
+      }
+
+      double[] newInputs = new double[bestInputs.length];
+      System.arraycopy(bestInputs, 0, newInputs, 0, bestInputs.length);
+      int toChoose = (int) Math.floor(Math.random() * (bestInputs.length));
+      newInputs[toChoose] += (Math.random() - 0.5) * 0.05;
+
+      DataPoint newDataPoint = new DataPoint(requiredOutput, newInputs);
+      double newOutputCost = getTotalCost(new DataPoint[] {newDataPoint}, inputNet);
+      if(newOutputCost < bestOutputCost) {
+        bestOutputCost = newOutputCost;
+        bestInputs = newInputs;
+        bestDataPoint = newDataPoint;
+      }
+    }
+    progressBar.complete();
+    return bestDataPoint;
+  }
+
   public static double getTotalCost(DataPoint[] data, Network network) {
     return Stream.of(data).mapToDouble(network::getCost).sum();
+  }
+
+  public static double getAccuracyClassifierData(DataPoint[] data, Network network) {
+    return Stream.of(data).mapToInt(dataPoint -> {
+      double[] output = network.getOutput(dataPoint);
+      int maxIndex = 0;
+      double maxValue = Double.MIN_VALUE;
+      for (int i = 0; i < dataPoint.outputSize; i++) {
+        if(output[i] > maxValue){
+          maxIndex = i;
+          maxValue = output[i];
+        }
+      }
+      return dataPoint.outputs[maxIndex] > 0.5 ? 1 : 0;
+    }).average().getAsDouble();
   }
 }
