@@ -10,11 +10,15 @@ public class Network {
   }
 
   Network(int... layerSizes) {
-    gates = new Gate[layerSizes.length - 1][];
-    for (int i = 1; i < layerSizes.length; i++) {
-      gates[i - 1] = new Gate[layerSizes[i]];
-      for (int j = 0; j < layerSizes[i]; j++) {
-        gates[i - 1][j] = new Gate(layerSizes[i - 1]);
+    if(layerSizes.length < 2) throw new IllegalArgumentException("Number of layers too small.");
+    int numberOfLayers = layerSizes.length - 1;
+    gates = new Gate[numberOfLayers][];
+    for (int layerNumber = 0; layerNumber < numberOfLayers; layerNumber++) {
+      int layerInputSize = layerSizes[layerNumber];
+      int layerOutputSize = layerSizes[layerNumber + 1];
+      gates[layerNumber] = new Gate[layerOutputSize];
+      for (int gateNumber = 0; gateNumber < layerOutputSize; gateNumber++) {
+        gates[layerNumber][gateNumber] = new Gate(layerInputSize);
       }
     }
   }
@@ -35,7 +39,7 @@ public class Network {
   public double getCost(DataPoint dataPoint) {
     double[] output = getOutput(dataPoint);
     double total = 0.0;
-    for (int i = 0; i < dataPoint.outputs.length; i++) {
+    for (int i = 0; i < dataPoint.outputSize; i++) {
       total += Math.pow(dataPoint.outputs[i] - output[i], 2);
     }
     return total;

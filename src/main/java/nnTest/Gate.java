@@ -36,7 +36,7 @@ public class Gate {
   }
 
   double getOutput(double... inputs) {
-    if(inputs.length != this.size) throw new IllegalArgumentException();
+    if(inputs.length != this.size) throw new IllegalArgumentException("Input size does");
     double weightedInputSum = this.bias;
     for (int i = 0; i < inputs.length; i++) {
       weightedInputSum += inputs[i]*weights[i];
@@ -51,6 +51,6 @@ public class Gate {
       sb.append(weights[i]);
       sb.append(", ");
     }
-    return sb.toString() + bias;
+    return sb.toString() + "bias: " + bias;
   }
 }
