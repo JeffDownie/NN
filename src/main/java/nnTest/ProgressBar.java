@@ -16,6 +16,7 @@ public class ProgressBar {
   }
 
   public void printUpdatedValue(long value){
+    if(value > maxValue) throw new IllegalArgumentException("Value: " + value + " is greater than the maximum value of: " + maxValue);
     if(complete) throw new IllegalStateException("Cannot update completed ProgressBar!");
     StringBuilder sb = new StringBuilder();
     sb.append("\r[");

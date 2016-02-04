@@ -1,8 +1,6 @@
 package nnTest;
 
-import java.util.stream.Stream;
-
-public class Network {
+public class Network implements Modifiable<Network, Network.NetworkDelta>{
   Gate[][] gates;
 
   private Network(Gate[][] gates){
@@ -23,19 +21,6 @@ public class Network {
     }
   }
 
-  Network randomisedOne() {
-    int toChooseLayer = (int) Math.floor(Math.random() * (gates.length));
-    int toChooseSpecific = (int) Math.floor(Math.random() * (gates[toChooseLayer].length));
-    Gate newGate = gates[toChooseLayer][toChooseSpecific].randomizedOne();
-    Gate[] newGateLayer = new Gate[gates[toChooseLayer].length];
-    System.arraycopy(gates[toChooseLayer], 0, newGateLayer, 0, newGateLayer.length);
-    newGateLayer[toChooseSpecific] = newGate;
-    Gate[][] newGates = new Gate[gates.length][];
-    System.arraycopy(gates, 0, newGates, 0, gates.length);
-    newGates[toChooseLayer] = newGateLayer;
-    return new Network(newGates);
-  }
-
   public double getCost(DataPoint dataPoint) {
     double[] output = getOutput(dataPoint);
     double total = 0.0;
@@ -54,7 +39,11 @@ public class Network {
   }
 
   private static double[] getLayerOutput(Gate[] layer, double[] inputs){
-    return Stream.of(layer).mapToDouble(gate -> gate.getOutput(inputs)).toArray();
+    double[] outputs = new double[layer.length];
+    for (int i = 0; i < layer.length; i++) {
+      outputs[i] = layer[i].getOutput(inputs);
+    }
+    return outputs;
   }
 
   @Override
@@ -68,5 +57,34 @@ public class Network {
       }
     }
     return sb.toString();
+  }
+
+  @Override
+  public Network applyDelta(final NetworkDelta delta) {
+    Gate newGate = gates[delta.changedLayer][delta.changedGate].applyDelta(delta.gateDelta);
+    Gate[] newGateLayer = new Gate[gates[delta.changedLayer].length];
+    System.arraycopy(gates[delta.changedLayer], 0, newGateLayer, 0, newGateLayer.length);
+    newGateLayer[delta.changedGate] = newGate;
+    Gate[][] newGates = new Gate[gates.length][];
+    System.arraycopy(gates, 0, newGates, 0, gates.length);
+    newGates[delta.changedLayer] = newGateLayer;
+    return new Network(newGates);
+  }
+
+  @Override
+  public NetworkDelta createRandomDelta() {
+    return new NetworkDelta(this);
+  }
+
+  public static class NetworkDelta implements Delta<Network, NetworkDelta>{
+    private int changedLayer;
+    private int changedGate;
+    private Gate.GateDelta gateDelta;
+
+    private NetworkDelta(Network network){
+      changedLayer = (int) Math.floor(Math.random() * (network.gates.length));
+      changedGate = (int) Math.floor(Math.random() * (network.gates[changedLayer].length));
+      gateDelta = network.gates[changedLayer][changedGate].createRandomDelta();
+    }
   }
 }

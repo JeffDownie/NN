@@ -1,6 +1,6 @@
 package nnTest;
 
-public class Gate {
+public class Gate implements Modifiable<Gate, Gate.GateDelta>{
   static final double maxDelta = 0.05;
   int size;
   double[] weights;
@@ -22,23 +22,10 @@ public class Gate {
     this.weights = weights;
   }
 
-  Gate randomizedOne() {
-    int toChoose = (int) Math.floor(Math.random() * (1 + size));
-    double change = (Math.random() - 0.5) * maxDelta;
-    if(toChoose == size) {
-      return new Gate(size, bias + change, weights);
-    } else {
-      double[] newWeights = new double[size];
-      System.arraycopy(weights, 0, newWeights, 0, size);
-      newWeights[toChoose] += change;
-      return new Gate(size, bias, newWeights);
-    }
-  }
-
   double getOutput(double... inputs) {
-    if(inputs.length != this.size) throw new IllegalArgumentException("Input size does");
+    if(inputs.length != this.size) throw new IllegalArgumentException("Input size does not agree with gate size.");
     double weightedInputSum = this.bias;
-    for (int i = 0; i < inputs.length; i++) {
+    for (int i = 0; i < this.size; i++) {
       weightedInputSum += inputs[i]*weights[i];
     }
     return 1.0 / (1.0 + Math.exp(-weightedInputSum));
@@ -52,5 +39,31 @@ public class Gate {
       sb.append(", ");
     }
     return sb.toString() + "bias: " + bias;
+  }
+
+  @Override
+  public Gate applyDelta(final GateDelta delta) {
+    if(delta.modifiedWeight == size) {
+      return new Gate(size, bias + delta.delta, weights);
+    }
+    double[] newWeights = new double[size];
+    System.arraycopy(weights, 0, newWeights, 0, size);
+    newWeights[delta.modifiedWeight] += delta.delta;
+    return new Gate(size, bias, newWeights);
+  }
+
+  @Override
+  public GateDelta createRandomDelta() {
+    return new GateDelta(this);
+  }
+
+  public static class GateDelta implements Delta<Gate, GateDelta>{
+    private int modifiedWeight;
+    private double delta;
+
+    private GateDelta(Gate gate) {
+      modifiedWeight = (int) Math.floor(Math.random() * (1 + gate.size));
+      delta = (Math.random() - 0.5) * maxDelta;
+    }
   }
 }

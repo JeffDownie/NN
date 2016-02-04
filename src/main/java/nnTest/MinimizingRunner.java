@@ -10,15 +10,18 @@ public class MinimizingRunner {
     ProgressBar progressBar = new ProgressBar(runs);
     Network bestNetwork = inputNet;
     double bestOutputCost = getTotalCost(dataPoints, bestNetwork);
-    double nextPrintTime = System.currentTimeMillis() + 200;
+    double nextPrintTime = System.currentTimeMillis() - 1;
     progressBar.printUpdatedValue(0);
+
     for (int i = 0; i < runs; i++) {
       if((System.currentTimeMillis() > nextPrintTime)){
         nextPrintTime = System.currentTimeMillis() + 200;
         progressBar.printUpdatedValue(i);
         System.out.print(" Cost: " + bestOutputCost);
       }
-      Network newNetwork = bestNetwork.randomisedOne();
+
+      Network.NetworkDelta delta = bestNetwork.createRandomDelta();
+      Network newNetwork = bestNetwork.applyDelta(delta);
       double newOutputCost = getTotalCost(dataPoints, newNetwork);
       if(newOutputCost < bestOutputCost) {
         bestOutputCost = newOutputCost;
@@ -61,7 +64,7 @@ public class MinimizingRunner {
   }
 
   public static double getTotalCost(DataPoint[] data, Network network) {
-    return Stream.of(data).mapToDouble(network::getCost).sum();
+    return Stream.of(data).parallel().mapToDouble(network::getCost).sum();
   }
 
   public static double getAccuracyClassifierData(DataPoint[] data, Network network) {
