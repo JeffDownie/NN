@@ -1,18 +1,19 @@
 package nnTest;
 
-/**
- * Created by JeffDownie on 02/02/2016.
- */
 public class ProgressBar {
-  public static final int ASCII_BAR_SIZE = 50;
+  private static final int DEFAULT_ASCII_BAR_SIZE = 50;
 
   private long maxValue;
   private long valuesPerProgress;
   private boolean complete = false;
 
-  public ProgressBar(long maxValue) {
+  public ProgressBar(long maxValue, int asciiBarSize) {
     this.maxValue = maxValue;
-    this.valuesPerProgress = maxValue / ASCII_BAR_SIZE;
+    this.valuesPerProgress = maxValue / asciiBarSize;
+  }
+
+  public ProgressBar(long maxValue) {
+    this(maxValue, DEFAULT_ASCII_BAR_SIZE);
   }
 
   public void printUpdatedValue(long value){
