@@ -3,15 +3,18 @@ package nnTest;
 public class Network implements Modifiable<Network, Network.NetworkDelta>, Outputable{
   Layer[] layers;
   int inputSize;
+  int outputSize;
 
-  private Network(int inputSize, Layer[] layers){
+  private Network(int inputSize, int outputSize, Layer[] layers){
     this.layers = layers;
     this.inputSize = inputSize;
+    this.outputSize = outputSize;
   }
 
   Network(int... layerSizes) {
     if(layerSizes.length < 2) throw new IllegalArgumentException("Number of layers too small.");
     this.inputSize = layerSizes[0];
+    this.outputSize = layerSizes[layerSizes.length - 1];
     int numberOfLayers = layerSizes.length - 1;
     layers = new Layer[numberOfLayers];
     for (int layerNumber = 0; layerNumber < numberOfLayers; layerNumber++) {
@@ -36,7 +39,7 @@ public class Network implements Modifiable<Network, Network.NetworkDelta>, Outpu
     Layer[] newLayers = new Layer[layers.length];
     System.arraycopy(layers, 0, newLayers, 0, layers.length);
     newLayers[delta.changedLayer] = newLayer;
-    return new Network(inputSize, newLayers);
+    return new Network(inputSize, outputSize, newLayers);
   }
 
   @Override
@@ -51,7 +54,7 @@ public class Network implements Modifiable<Network, Network.NetworkDelta>, Outpu
 
   @Override
   public int getOutputSize() {
-    return layers.length;
+    return outputSize;
   }
 
   @Override
