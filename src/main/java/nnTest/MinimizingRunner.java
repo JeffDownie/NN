@@ -2,9 +2,6 @@ package nnTest;
 
 import java.util.stream.Stream;
 
-/**
- * Created by JeffDownie on 02/02/2016.
- */
 public class MinimizingRunner {
   public static Network improveNetwork(Network inputNet, DataPoint[] dataPoints, int runs) {
     ProgressBar progressBar = new ProgressBar(runs);
@@ -64,12 +61,12 @@ public class MinimizingRunner {
   }
 
   public static double getTotalCost(DataPoint[] data, Network network) {
-    return Stream.of(data).parallel().mapToDouble(network::getCost).sum();
+    return Stream.of(data).parallel().mapToDouble(datapoint -> network.getCost(datapoint.inputs, datapoint.outputs)).sum();
   }
 
   public static double getAccuracyClassifierData(DataPoint[] data, Network network) {
     return Stream.of(data).mapToInt(dataPoint -> {
-      double[] output = network.getOutput(dataPoint);
+      double[] output = network.getOutput(dataPoint.inputs);
       int maxIndex = 0;
       double maxValue = Double.MIN_VALUE;
       for (int i = 0; i < dataPoint.outputSize; i++) {
