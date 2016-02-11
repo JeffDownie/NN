@@ -1,4 +1,6 @@
-package nnTest;
+package nnTest.network.api;
+
+import nnTest.parser.DataPoint;
 
 import java.util.stream.Stream;
 

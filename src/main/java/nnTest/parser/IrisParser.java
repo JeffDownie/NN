@@ -1,4 +1,4 @@
-package nnTest;
+package nnTest.parser;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,8 +21,7 @@ public class IrisParser {
           return new DataPoint(outputs, inputs);
         });
     } catch (IOException e) {
-      e.printStackTrace();
-      return Stream.empty();
+      throw new RuntimeException(e);
     }
   }
 }

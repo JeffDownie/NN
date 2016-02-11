@@ -1,6 +1,10 @@
-package nnTest;
+package nnTest.network.impl;
 
-public class Network implements Modifiable<Network, Network.NetworkDelta>, Outputable{
+import nnTest.network.api.Delta;
+import nnTest.network.api.Modifiable;
+import nnTest.network.api.Outputable;
+
+public class Network implements Modifiable<Network, Network.NetworkDelta>, Outputable {
   Layer[] layers;
   int inputSize;
   int outputSize;
@@ -66,7 +70,7 @@ public class Network implements Modifiable<Network, Network.NetworkDelta>, Outpu
     return sb.toString();
   }
 
-  public static class NetworkDelta implements Delta<Network, NetworkDelta>{
+  public static class NetworkDelta implements Delta<Network, NetworkDelta> {
     private int changedLayer;
     private Layer.LayerDelta layerDelta;
 

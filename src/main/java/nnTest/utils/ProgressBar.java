@@ -1,4 +1,4 @@
-package nnTest;
+package nnTest.utils;
 
 public class ProgressBar {
   private static final int DEFAULT_ASCII_BAR_SIZE = 50;

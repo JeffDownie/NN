@@ -1,4 +1,4 @@
-package nnTest;
+package nnTest.network.api;
 
 public interface SingleOutput extends Outputable {
   @Override

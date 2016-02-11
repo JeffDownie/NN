@@ -1,10 +1,11 @@
-package nnTest;
+package nnTest.parser;
 
 import java.util.Arrays;
 
 public class DataPoint {
-  double[] inputs, outputs;
-  int inputSize, outputSize;
+  public final double[] inputs, outputs;
+  public final int inputSize, outputSize;
+
   DataPoint(double output, double... inputs){
     this(new double[] {output}, inputs);
   }

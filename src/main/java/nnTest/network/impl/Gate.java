@@ -1,6 +1,10 @@
-package nnTest;
+package nnTest.network.impl;
 
-public class Gate implements Modifiable<Gate, Gate.GateDelta>, SingleOutput{
+import nnTest.network.api.Delta;
+import nnTest.network.api.Modifiable;
+import nnTest.network.api.SingleOutput;
+
+public class Gate implements Modifiable<Gate, Gate.GateDelta>, SingleOutput {
   static final double maxDelta = 0.05;
   int inputSize;
   double[] weights;
@@ -63,7 +67,7 @@ public class Gate implements Modifiable<Gate, Gate.GateDelta>, SingleOutput{
     return this.inputSize;
   }
 
-  public static class GateDelta implements Delta<Gate, GateDelta>{
+  public static class GateDelta implements Delta<Gate, GateDelta> {
     private int modifiedWeight;
     private double delta;
 

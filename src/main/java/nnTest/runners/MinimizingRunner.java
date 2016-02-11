@@ -1,4 +1,10 @@
-package nnTest;
+package nnTest.runners;
+
+import nnTest.network.api.Delta;
+import nnTest.network.api.Modifiable;
+import nnTest.network.api.Outputable;
+import nnTest.parser.DataPoint;
+import nnTest.utils.ProgressBar;
 
 public class MinimizingRunner<T extends Outputable & Modifiable<T, D>, D extends Delta<T, D>> {
   public T minimizeCost(T initialFunction, DataPoint[] dataPoints, int runs){

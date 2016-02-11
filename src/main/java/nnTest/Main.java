@@ -1,5 +1,10 @@
 package nnTest;
 
+import nnTest.network.impl.Gate;
+import nnTest.parser.DataPoint;
+import nnTest.parser.IrisParser;
+import nnTest.runners.MinimizingRunner;
+
 public class Main {
   public static void main(String[] args) throws Exception{
     DataPoint[] dataPoints = IrisParser.getData().toArray(DataPoint[]::new);
