@@ -1,10 +1,10 @@
 package nnTest.network.impl;
 
 import nnTest.network.api.Delta;
-import nnTest.network.api.Modifiable;
 import nnTest.network.api.Outputable;
+import nnTest.network.api.RandomModifiable;
 
-public class Layer implements Modifiable<Layer, Layer.LayerDelta>, Outputable {
+public class Layer implements RandomModifiable<Layer, Layer.LayerDelta>, Outputable {
   private Gate[] gates;
   private int inputSize;
 

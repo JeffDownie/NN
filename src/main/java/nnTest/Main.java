@@ -3,12 +3,14 @@ package nnTest;
 import nnTest.network.impl.Gate;
 import nnTest.parser.DataPoint;
 import nnTest.parser.IrisParser;
-import nnTest.runners.MinimizingRunner;
+import nnTest.runners.RandomMinimizingRunner;
+
+import java.util.stream.Stream;
 
 public class Main {
   public static void main(String[] args) throws Exception{
     DataPoint[] dataPoints = IrisParser.getData().toArray(DataPoint[]::new);
-//    MinimizingRunner<Network, Network.NetworkDelta> runner = new MinimizingRunner<>();
+//    RandomMinimizingRunner<Network, Network.NetworkDelta> runner = new RandomMinimizingRunner<>();
 
     /*long time = System.currentTimeMillis();
     for (int i = 0; i < 1; i++) {
@@ -19,8 +21,12 @@ public class Main {
 
     Gate opt = new Gate(1);
     System.out.println(opt);
-    DataPoint[] points = new DataPoint[]{new DataPoint(0.5, 0.5), new DataPoint(1.0, 1.0), new DataPoint(0.0, 0.0)};
-    opt = new MinimizingRunner<Gate, Gate.GateDelta>().minimizeCost(opt, points, 10000);
+    DataPoint[] points = new DataPoint[10];
+    for (int i = 0; i < 10; i++) {
+      points[i] = new DataPoint(i / 10.0, i / 10.0);
+    }
+    opt = new RandomMinimizingRunner<Gate, Gate.GateDelta>().minimizeCost(opt, points, 100000);
+    Stream.of(points).forEach(System.out::println);
     System.out.println(opt.getTotalCost(points));
     System.out.println(opt);
 //    System.out.println((System.currentTimeMillis() - time));

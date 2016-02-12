@@ -1,16 +1,16 @@
 package nnTest.network.impl;
 
 import nnTest.network.api.Delta;
-import nnTest.network.api.Modifiable;
+import nnTest.network.api.RandomModifiable;
 import nnTest.network.api.SingleOutput;
 
-public class Gate implements Modifiable<Gate, Gate.GateDelta>, SingleOutput {
+public class Gate implements RandomModifiable<Gate, Gate.GateDelta>, SingleOutput {
   static final double maxDelta = 0.05;
   int inputSize;
   double[] weights;
   double bias;
 
-  Gate(int inputSize) {
+  public Gate(int inputSize) {
     this.inputSize = inputSize;
     bias = Math.random() - 0.5;
     weights = new double[inputSize];

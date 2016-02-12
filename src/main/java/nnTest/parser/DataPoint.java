@@ -6,11 +6,11 @@ public class DataPoint {
   public final double[] inputs, outputs;
   public final int inputSize, outputSize;
 
-  DataPoint(double output, double... inputs){
+  public DataPoint(double output, double... inputs){
     this(new double[] {output}, inputs);
   }
 
-  DataPoint(double[] outputs, double... inputs) {
+  public DataPoint(double[] outputs, double... inputs) {
     this.inputs = inputs;
     this.outputs = outputs;
     this.inputSize = inputs.length;
