@@ -1,10 +1,11 @@
 package nnTest.network.impl;
 
 import nnTest.network.api.Delta;
+import nnTest.network.api.GradientModifiable;
 import nnTest.network.api.RandomModifiable;
 import nnTest.network.api.SingleOutput;
 
-public class Gate implements RandomModifiable<Gate, Gate.GateDelta>, SingleOutput {
+public class Gate implements RandomModifiable<Gate, Gate.GateDelta>, SingleOutput, GradientModifiable<Gate, Gate.GateDelta> {
   static final double maxDelta = 0.05;
   int inputSize;
   double[] weights;
@@ -33,7 +34,7 @@ public class Gate implements RandomModifiable<Gate, Gate.GateDelta>, SingleOutpu
     for (int i = 0; i < this.inputSize; i++) {
       weightedInputSum += inputs[i]*weights[i];
     }
-    return 1.0 / (1.0 + Math.exp(-weightedInputSum));
+    return sigmoid(weightedInputSum);
   }
 
   @Override
@@ -67,13 +68,33 @@ public class Gate implements RandomModifiable<Gate, Gate.GateDelta>, SingleOutpu
     return this.inputSize;
   }
 
+  @Override
+  public GateDelta getBestDelta(final double[] input, final double[] expectedOutput) {
+    if(expectedOutput.length != 1) throw new IllegalArgumentException("ExpectedOutput size is not 1, instead is " + expectedOutput.length);
+    double output = this.getSingleOutput(input);
+    double outputDifference = expectedOutput[0] - output;
+    double gradient = output * (1 - output);
+
+    return null;
+  }
+
+  private static double sigmoid(double input) {
+    return 1.0 / (1.0 + Math.exp(-input));
+  }
+
   public static class GateDelta implements Delta<Gate, GateDelta> {
     private int modifiedWeight;
     private double delta;
 
     private GateDelta(Gate gate) {
-      modifiedWeight = (int) Math.floor(Math.random() * (1 + gate.inputSize));
-      delta = (Math.random() - 0.5) * maxDelta;
+      this((int) Math.floor(Math.random() * (1 + gate.inputSize)), (Math.random() - 0.5) * maxDelta);
     }
+
+    private GateDelta(int modifiedWeight, double delta) {
+      this.modifiedWeight = modifiedWeight;
+      this.delta = delta;
+    }
+
+
   }
 }

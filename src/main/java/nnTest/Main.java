@@ -21,15 +21,13 @@ public class Main {
 
     Gate opt = new Gate(1);
     System.out.println(opt);
-    DataPoint[] points = new DataPoint[10];
-    for (int i = 0; i < 10; i++) {
-      points[i] = new DataPoint(i / 10.0, i / 10.0);
-    }
-    opt = new RandomMinimizingRunner<Gate, Gate.GateDelta>().minimizeCost(opt, points, 100000);
-    Stream.of(points).forEach(System.out::println);
+    DataPoint[] points = new DataPoint[1];
+    points[0] = new DataPoint(0.5, 0.5);
     System.out.println(opt.getTotalCost(points));
+    Gate.GateDelta delta = opt.getBestDelta(points[0].inputs, points[0].outputs);
+    opt = opt.applyDelta(delta);
     System.out.println(opt);
-//    System.out.println((System.currentTimeMillis() - time));
+    System.out.println(opt.getTotalCost(points));
   }
 }
 
