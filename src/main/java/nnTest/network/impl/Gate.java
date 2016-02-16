@@ -5,6 +5,8 @@ import nnTest.network.api.GradientModifiable;
 import nnTest.network.api.RandomModifiable;
 import nnTest.network.api.SingleOutput;
 
+import java.util.Arrays;
+
 public class Gate implements RandomModifiable<Gate, Gate.GateDelta>, SingleOutput, GradientModifiable<Gate, Gate.GateDelta> {
   static final double maxDelta = 0.05;
   int inputSize;
@@ -49,13 +51,12 @@ public class Gate implements RandomModifiable<Gate, Gate.GateDelta>, SingleOutpu
 
   @Override
   public Gate applyDelta(final GateDelta delta) {
-    if(delta.modifiedWeight == inputSize) {
-      return new Gate(inputSize, bias + delta.delta, weights);
-    }
     double[] newWeights = new double[inputSize];
     System.arraycopy(weights, 0, newWeights, 0, inputSize);
-    newWeights[delta.modifiedWeight] += delta.delta;
-    return new Gate(inputSize, bias, newWeights);
+    for (int i = 0; i < delta.deltas.length; i++) {
+      newWeights[i] += delta.deltas[i];
+    }
+    return new Gate(inputSize, bias + delta.biasDelta, newWeights);
   }
 
   @Override
@@ -73,9 +74,19 @@ public class Gate implements RandomModifiable<Gate, Gate.GateDelta>, SingleOutpu
     if(expectedOutput.length != 1) throw new IllegalArgumentException("ExpectedOutput size is not 1, instead is " + expectedOutput.length);
     double output = this.getSingleOutput(input);
     double outputDifference = expectedOutput[0] - output;
-    double gradient = output * (1 - output);
 
-    return null;
+    double biasDelta = sigmoidGradient(this.bias) * outputDifference;
+    double[] weightDeltas = new double[this.inputSize];
+    for (int i = 0; i < this.inputSize; i++) {
+      weightDeltas[i] = sigmoidGradient(this.weights[i]) * outputDifference;
+    }
+
+    return new GateDelta(biasDelta, weightDeltas);
+  }
+
+  private static double sigmoidGradient(double input) {
+    double val = sigmoid(input);
+    return val * (1 - val);
   }
 
   private static double sigmoid(double input) {
@@ -83,18 +94,47 @@ public class Gate implements RandomModifiable<Gate, Gate.GateDelta>, SingleOutpu
   }
 
   public static class GateDelta implements Delta<Gate, GateDelta> {
-    private int modifiedWeight;
-    private double delta;
+    private double biasDelta;
+    private double[] deltas;
 
     private GateDelta(Gate gate) {
-      this((int) Math.floor(Math.random() * (1 + gate.inputSize)), (Math.random() - 0.5) * maxDelta);
+      int modifiedWeight = (int) Math.floor(Math.random() * (1 + gate.inputSize));
+      double delta = (Math.random() - 0.5) * maxDelta;
+
+      if(modifiedWeight == gate.inputSize) {
+        this.biasDelta = delta;
+        this.deltas = new double[gate.inputSize];
+        for (int i = 0; i < deltas.length; i++) {
+          deltas[i] = 0.0;
+        }
+      } else {
+        this.biasDelta = 0.0;
+        this.deltas = new double[gate.inputSize];
+        for (int i = 0; i < deltas.length; i++) {
+          deltas[i] = 0.0;
+        }
+        this.deltas[modifiedWeight] = delta;
+      }
     }
 
-    private GateDelta(int modifiedWeight, double delta) {
-      this.modifiedWeight = modifiedWeight;
-      this.delta = delta;
+    private GateDelta(double biasDelta, double[] weightDeltas) {
+      this.biasDelta = biasDelta;
+      this.deltas = weightDeltas;
     }
 
+    @Override
+    public String toString() {
+      return "{" + biasDelta + "," + Arrays.toString(deltas) + "}";
+    }
 
+    @Override
+    public GateDelta scale(final double scalar) {
+      double[] newWeightDeltas = new double[deltas.length];
+      System.arraycopy(deltas, 0, newWeightDeltas, 0, deltas.length);
+      for (int i = 0; i < deltas.length; i++) {
+        newWeightDeltas[i] *= scalar;
+      }
+      return new GateDelta(biasDelta * scalar, newWeightDeltas);
+    }
   }
 }
