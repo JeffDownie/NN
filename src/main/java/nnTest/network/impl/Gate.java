@@ -97,6 +97,10 @@ public class Gate implements RandomModifiable<Gate, Gate.GateDelta>, SingleOutpu
     private double biasDelta;
     private double[] deltas;
 
+    public GateDelta(int size) {
+      this(0.0, new double[size]);
+    }
+
     private GateDelta(Gate gate) {
       int modifiedWeight = (int) Math.floor(Math.random() * (1 + gate.inputSize));
       double delta = (Math.random() - 0.5) * maxDelta;

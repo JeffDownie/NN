@@ -1,11 +1,11 @@
 package nnTest.network.impl;
 
 import nnTest.network.api.Delta;
+import nnTest.network.api.GradientModifiable;
 import nnTest.network.api.Outputable;
 import nnTest.network.api.RandomModifiable;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-public class Layer implements RandomModifiable<Layer, Layer.LayerDelta>, Outputable {
+public class Layer implements RandomModifiable<Layer, Layer.LayerDelta>, Outputable, GradientModifiable<Layer, Layer.LayerDelta> {
   private Gate[] gates;
   private int inputSize;
 
@@ -35,10 +35,11 @@ public class Layer implements RandomModifiable<Layer, Layer.LayerDelta>, Outputa
 
   @Override
   public Layer applyDelta(final LayerDelta delta) {
-    Gate newGate = gates[delta.modifiedGate].applyDelta(delta.gateDelta);
     Gate[] newGates = new Gate[gates.length];
     System.arraycopy(gates, 0, newGates, 0, gates.length);
-    newGates[delta.modifiedGate] = newGate;
+    for (int i = 0; i < gates.length; i++) {
+      newGates[i] = newGates[i].applyDelta(delta.gateDeltas[i]);
+    }
     return new Layer(inputSize, newGates);
   }
 
@@ -58,6 +59,15 @@ public class Layer implements RandomModifiable<Layer, Layer.LayerDelta>, Outputa
   }
 
   @Override
+  public LayerDelta getBestDelta(final double[] input, final double[] expectedOutput) {
+    Gate.GateDelta[] gateDeltas = new Gate.GateDelta[gates.length];
+    for (int i = 0; i < gates.length; i++) {
+      gateDeltas[i] = gates[i].getBestDelta(input, new double[] {expectedOutput[i]});
+    }
+    return new LayerDelta(gateDeltas);
+  }
+
+  @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     for(Gate gate : gates) {
@@ -68,22 +78,41 @@ public class Layer implements RandomModifiable<Layer, Layer.LayerDelta>, Outputa
   }
 
   public static class LayerDelta implements Delta<Layer, LayerDelta> {
-    private int modifiedGate;
-    private Gate.GateDelta gateDelta;
+    private Gate.GateDelta[] gateDeltas;
 
     private LayerDelta(Layer layer) {
-      modifiedGate = (int) Math.floor(Math.random() * (layer.gates.length));
-      gateDelta = layer.gates[modifiedGate].createRandomDelta();
+      int modifiedGate = (int) Math.floor(Math.random() * (layer.gates.length));
+      Gate.GateDelta[] gateDeltas = new Gate.GateDelta[layer.gates.length];
+
+      for (int i = 0; i < layer.gates.length; i++) {
+        gateDeltas[i] = new Gate.GateDelta(layer.gates[modifiedGate].getInputSize());
+      }
+      gateDeltas[modifiedGate] = layer.gates[modifiedGate].createRandomDelta();
+      this.gateDeltas = gateDeltas;
+    }
+
+    private LayerDelta(Gate.GateDelta[] deltas) {
+      this.gateDeltas = deltas;
     }
 
     @Override
     public LayerDelta scale(final double scalar) {
-      throw new NotImplementedException();
+      Gate.GateDelta[] newDeltas = new Gate.GateDelta[gateDeltas.length];
+      System.arraycopy(gateDeltas, 0, newDeltas, 0, gateDeltas.length);
+      for (int i = 0; i < gateDeltas.length; i++) {
+        newDeltas[i] = newDeltas[i].scale(scalar);
+      }
+      return new LayerDelta(newDeltas);
     }
 
     @Override
     public LayerDelta add(final LayerDelta addTo) {
-      throw new NotImplementedException();
+      Gate.GateDelta[] newDeltas = new Gate.GateDelta[gateDeltas.length];
+      System.arraycopy(gateDeltas, 0, newDeltas, 0, gateDeltas.length);
+      for (int i = 0; i < gateDeltas.length; i++) {
+        newDeltas[i] = newDeltas[i].add(addTo.gateDeltas[i]);
+      }
+      return new LayerDelta(newDeltas);
     }
   }
 }

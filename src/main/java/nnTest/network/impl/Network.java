@@ -3,6 +3,7 @@ package nnTest.network.impl;
 import nnTest.network.api.Delta;
 import nnTest.network.api.Outputable;
 import nnTest.network.api.RandomModifiable;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class Network implements RandomModifiable<Network, Network.NetworkDelta>, Outputable {
   Layer[] layers;
@@ -77,6 +78,16 @@ public class Network implements RandomModifiable<Network, Network.NetworkDelta>,
     private NetworkDelta(Network network){
       changedLayer = (int) Math.floor(Math.random() * (network.layers.length));
       layerDelta = network.layers[changedLayer].createRandomDelta();
+    }
+
+    @Override
+    public NetworkDelta scale(final double scalar) {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public NetworkDelta add(final NetworkDelta addTo) {
+      throw new NotImplementedException();
     }
   }
 }
