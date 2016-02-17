@@ -136,5 +136,16 @@ public class Gate implements RandomModifiable<Gate, Gate.GateDelta>, SingleOutpu
       }
       return new GateDelta(biasDelta * scalar, newWeightDeltas);
     }
+
+    @Override
+    public GateDelta add(final GateDelta addTo) {
+      if(addTo.deltas.length != this.deltas.length) throw new IllegalArgumentException("Gates are not of same size:" + this + "," + addTo);
+      double[] newWeightDeltas = new double[deltas.length];
+      System.arraycopy(deltas, 0, newWeightDeltas, 0, deltas.length);
+      for (int i = 0; i < deltas.length; i++) {
+        newWeightDeltas[i] += addTo.deltas[i];
+      }
+      return new GateDelta(biasDelta * addTo.biasDelta, newWeightDeltas);
+    }
   }
 }
