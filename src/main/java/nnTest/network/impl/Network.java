@@ -48,6 +48,11 @@ public class Network implements RandomModifiable<Network, Network.NetworkDelta>,
   }
 
   @Override
+  public NetworkDelta getEmptyDelta() {
+    throw new NotImplementedException();
+  }
+
+  @Override
   public NetworkDelta createRandomDelta() {
     return new NetworkDelta(this);
   }

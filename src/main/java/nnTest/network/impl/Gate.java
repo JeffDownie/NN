@@ -60,6 +60,11 @@ public class Gate implements RandomModifiable<Gate, Gate.GateDelta>, SingleOutpu
   }
 
   @Override
+  public GateDelta getEmptyDelta() {
+    return new GateDelta(this.getInputSize());
+  }
+
+  @Override
   public GateDelta createRandomDelta() {
     return new GateDelta(this);
   }

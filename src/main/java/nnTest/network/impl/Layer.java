@@ -44,6 +44,11 @@ public class Layer implements RandomModifiable<Layer, Layer.LayerDelta>, Outputa
   }
 
   @Override
+  public LayerDelta getEmptyDelta() {
+    return new LayerDelta(this.getInputSize(), this.getOutputSize());
+  }
+
+  @Override
   public LayerDelta createRandomDelta() {
     return new LayerDelta(this);
   }
@@ -79,6 +84,13 @@ public class Layer implements RandomModifiable<Layer, Layer.LayerDelta>, Outputa
 
   public static class LayerDelta implements Delta<Layer, LayerDelta> {
     private Gate.GateDelta[] gateDeltas;
+
+    private LayerDelta(int inputSize, int outputSize) {
+      gateDeltas = new Gate.GateDelta[outputSize];
+      for (int i = 0; i < gateDeltas.length; i++) {
+        gateDeltas[i] = new Gate.GateDelta(inputSize);
+      }
+    }
 
     private LayerDelta(Layer layer) {
       int modifiedGate = (int) Math.floor(Math.random() * (layer.gates.length));

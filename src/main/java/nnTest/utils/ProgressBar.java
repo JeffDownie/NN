@@ -8,6 +8,9 @@ public class ProgressBar {
   private boolean complete = false;
 
   public ProgressBar(long maxValue, int asciiBarSize) {
+    if(maxValue < asciiBarSize) {
+      asciiBarSize = (int) maxValue;
+    }
     this.maxValue = maxValue;
     this.valuesPerProgress = maxValue / asciiBarSize;
   }
