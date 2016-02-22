@@ -1,7 +1,6 @@
 package nnTest.runners;
 
 import nnTest.network.api.Delta;
-import nnTest.network.api.Modifiable;
 import nnTest.network.api.Outputable;
 import nnTest.network.api.RandomModifiable;
 import nnTest.parser.DataPoint;

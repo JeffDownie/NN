@@ -99,8 +99,8 @@ public class Gate implements RandomModifiable<Gate, Gate.GateDelta>, SingleOutpu
   }
 
   public static class GateDelta implements Delta<Gate, GateDelta> {
-    private double biasDelta;
-    private double[] deltas;
+    public double biasDelta;
+    public double[] deltas;
 
     public GateDelta(int size) {
       this(0.0, new double[size]);

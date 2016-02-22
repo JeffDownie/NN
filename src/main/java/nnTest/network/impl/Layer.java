@@ -83,7 +83,7 @@ public class Layer implements RandomModifiable<Layer, Layer.LayerDelta>, Outputa
   }
 
   public static class LayerDelta implements Delta<Layer, LayerDelta> {
-    private Gate.GateDelta[] gateDeltas;
+    public Gate.GateDelta[] gateDeltas;
 
     private LayerDelta(int inputSize, int outputSize) {
       gateDeltas = new Gate.GateDelta[outputSize];
@@ -95,9 +95,8 @@ public class Layer implements RandomModifiable<Layer, Layer.LayerDelta>, Outputa
     private LayerDelta(Layer layer) {
       int modifiedGate = (int) Math.floor(Math.random() * (layer.gates.length));
       Gate.GateDelta[] gateDeltas = new Gate.GateDelta[layer.gates.length];
-
       for (int i = 0; i < layer.gates.length; i++) {
-        gateDeltas[i] = new Gate.GateDelta(layer.gates[modifiedGate].getInputSize());
+        gateDeltas[i] = layer.gates[i].getEmptyDelta();
       }
       gateDeltas[modifiedGate] = layer.gates[modifiedGate].createRandomDelta();
       this.gateDeltas = gateDeltas;
